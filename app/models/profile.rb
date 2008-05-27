@@ -108,11 +108,8 @@ class Profile < ActiveRecord::Base
   
   
   def self.featured
-    find_options = {
-      :include => :user,
-      :conditions => ["is_active = ? and about_me IS NOT NULL and user_id is not null", true],
-    }
-    find(:first, find_options.merge(:offset => rand( count(find_options) - 1)))
+    ids = connection.select_all('select id from profiles where is_active = true and about_me is not null and user_id is not null')
+    find(ids[rand(ids.length)]["id"].to_i) unless ids.blank?
   end  
   
   def no_data?
